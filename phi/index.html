@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<!-- saved from url=(0035)http://js1k.com/pleaseDontHotlinkMe -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>JS1k, 1k demo submission [premasagar]</title>
+		<meta charset="utf-8">
+	</head>
+	<body>
+		<canvas id="c"></canvas>
+		<script>
+		function H(){function j(y){k[y]=d(y==I?e*z:z-k[y]*a)}var a=p()+l/2,e,q,r,s;if(f>m-A/2)n=-n;if(i>t-A/2)u=-u;if(f<=v){f=v;n=1}if(i<=B){i=B;u=1}f=d(n>0?f*w:f/w*a);i=d(u>0?i*w:i/w*a);e=f/m;j("r");j("g");j("b");q=d(e*A*a);r=d(f-v-q/2);s=d(i-B-q/2);if(r>m||s>t)return[d(m/x)*a,d(t/x)*a];c[D]();c.arc(r,s,q,0,J*2,false);c[E]();c[F]=C+g+","+g+","+b+","+l*a+")";c.fillStyle=C+K+","+g+","+b+","+l*l*l*a+")";c[G]();c.fill();return[r,s]}var k=this,L=k.setInterval,o=Math,J=o.PI,x=1.618,l=1/x,z=255,d=o.ceil,p=o.random,h=document;o=h.body.style;h=h.getElementById("c");var c=h.getContext("2d"),m=h.width=k.innerWidth,t=h.height=k.innerHeight,w=x,n=1,u=n,v=400,B=v,A=100,f,i;h=p();var I=h>=0.5?"r":h<=0.3?"b":"g",K=g=b=z,C="rgba(",F="strokeStyle",G="stroke",D="beginPath",E="closePath";o.cssText="margin:0;background-color:#000;overflow:hidden";f=d(m*p());i=d(t*p());L(function(){for(var j=[],a=0,e;a<50;a++)j[a]=H();c[D]();e=j[0];c.moveTo(e[0],e[1]);for(a=50;a;a--){e=j[a-1];c.lineTo(e[0],e[1])}c[E]();c[F]=C+"0,0,0,0.1)";c[G]()},40)
+		</script>
+		<script type=r>
+		(function(){
+			var win = this,
+			    setInterval = win.setInterval,
+			    //_ = function(){console.log.apply(console, arguments);},
+			    M = Math,
+			    PI = M.PI,
+			    PHI = 1.618,
+			    phi = 1 / PHI,
+			    RGBMAX = 255,
+			    ceil = M.ceil,
+			    random = M.random,
+			    doc = document,
+			    body = doc.body,
+			    bodyStyle = body.style,
+			    canvas = doc.getElementById('c'),
+			    ctx = canvas.getContext('2d'),
+			    w = canvas.width = win.innerWidth,
+			    h = canvas.height = win.innerHeight,
+			    fps = 25,
+			    steps = 50,
+			    factor = PHI, //1 + PHI / (PHI * PHI),
+			    dirX = 1,
+			    dirY = dirX,
+			    minX = 400,
+			    minY = minX,
+			    maxRadius = 100,
+			    x, y,
+			    toneSeed = random(),
+			    tone = toneSeed >= 0.5 ?
+			        'r' :
+			        (toneSeed <= 0.3) ?
+		            'b' :
+		            'g',
+			    r = g = b = RGBMAX,
+			    intervalRef,
+			    
+			    rgba = 'rgba(',
+			    strokeStyle = 'strokeStyle',
+			    stroke = 'stroke',
+			    beginPath = 'beginPath',
+			    closePath = 'closePath';
+			    
+			function draw(){
+			    var drift = random() + phi / 2,
+			        intensity, radius, posX, posY;
+			    
+			    function colorComponent(color){
+			        win[color] = ceil(
+			            color == tone ?
+			                intensity * RGBMAX :
+			                RGBMAX - win[color] * drift
+			        );
+			    }
+			    
+			    // direction & coords
+			    if (x > w - maxRadius / 2){
+			        dirX = -dirX;
+			    }
+			    if (y > h - maxRadius / 2){
+			        dirY = -dirY;
+			    }
+			    if (x <= minX){
+			        x = minX;
+			        dirX = 1;
+			    }
+			    if (y <= minY){
+			        y = minY;
+			        dirY = 1;
+			    }
+			    x = ceil(dirX > 0 ? x * factor : (x / factor) * drift);
+			    y = ceil(dirY > 0 ? y * factor : (y / factor) * drift);
+		        intensity = x / w;
+			    
+			    // color
+		        colorComponent('r');
+		        colorComponent('g');
+		        colorComponent('b');
+		        
+		        // radius
+		        radius = ceil(intensity * maxRadius * drift);
+		        
+		        // positions
+		        posX = ceil(x - minX - radius / 2);
+		        posY = ceil(y - minY - radius / 2);
+		        
+		        if (posX > w || posY > h){
+		            return [ceil(w / PHI) * drift, ceil(h / PHI) * drift];
+		        }
+			    
+			    // paths
+			    ctx[beginPath]();
+                ctx.arc(posX, posY, radius, 0, PI * 2, false);
+                ctx[closePath]();
+		        
+		        // styles
+                ctx[strokeStyle] = rgba+ g +','+ g +','+ b +','+ phi * drift +')';
+			    ctx.fillStyle = rgba+ r +','+ g +','+ b +','+ (phi * phi * phi * drift) +')';
+			    
+			    // draw
+			    ctx[stroke]();
+                ctx.fill();
+		        
+		        return [posX, posY];
+			}
+            
+            function render(){
+                var coords = [],
+                    i = 0, xy;
+                
+                // draw circles, in a number of steps
+                for (; i < steps; i++){
+                    coords[i] = draw();
+                }
+                
+                // draw connecting lines
+                ctx[beginPath]();
+                xy = coords[0];
+                ctx.moveTo(xy[0], xy[1]);
+                
+                for (i = steps; i; i--){
+                    xy = coords[i-1];
+                    ctx.lineTo(xy[0], xy[1]);
+                }
+                ctx[closePath]();
+                ctx[strokeStyle] = rgba+'0,0,0,0.1)';
+                ctx[stroke]();
+			}
+			
+			bodyStyle.cssText = 'margin:0;background-color:#000;overflow:hidden';
+			
+			x = ceil(w * random());
+			y = ceil(h * random());
+			intervalRef = setInterval(render, 1000 / fps);
+			
+			/*
+			// toggle animation
+			canvas.onclick = doc.onkeydown = function(event){
+			    var which = event.which;
+                if (which == 1 || which == 32){ // click or SPACE key
+                    if (intervalRef){
+        			    win.clearInterval(intervalRef);
+        			    intervalRef = null;
+        			}
+        			else {
+        			    intervalRef = setInterval(render, 1000 / fps)
+        			}
+                }
+            };
+            */
+        }());
+		</script>
+	
+</body></html>
