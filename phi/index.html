@@ -9,9 +9,10 @@
 		    /*
 		    For better optimisation after Google Closure Compiler:
 		        * Remove leading zero from floats (0.5 to .5)
-		        * Put 'onclick' string lookup back in, if using
+		        * Put 'onclick' string lookup back in, if using that block
 		        * Put win = this back in, and change this to win
-		        * Check semicolon rules: http://inimino.org/~inimino/blog/javascript_semicolons
+		        * Remove trailing semicolon
+		        * Could remove initial 'var ' and replace following commas with semicolons
 		    */
 		</script>
 	</head>
@@ -22,7 +23,6 @@
 			
 			    // Maths
 			    M = Math,
-			    PI = M.PI,
 			    phi = .618,
 			    PHI = 1 / phi,
 			    RGBMAX = 255,
@@ -112,7 +112,7 @@
 		        radius = ceil(intensity * maxRadius * drift);
 		        
 		        // positions
-		        posX = ceil(x - minX - radius / 2);
+		        posX = ceil(x - minX - radius / 2); // TODO store var
 		        posY = ceil(y - minY - radius / 2);
 		        
 		        if (posX > w || posY > h){
@@ -121,7 +121,7 @@
 			    
 			    // paths
 			    ctx[beginPath]();
-                ctx.arc(posX, posY, radius, 0, PI * 2, false);
+                ctx.arc(posX, posY, radius, 0, M.PI * 2, true);
                 ctx[closePath]();
 		        
 		        // styles
