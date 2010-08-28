@@ -114,6 +114,10 @@ function draw(){
     return [posX, posY];
 }
 
+function drawLines(coords){
+
+}
+
 function render(){
     // draw circles, in a number of steps
     for (var coords = [], i = 0, xy; i < steps; i++){
@@ -137,6 +141,8 @@ doc.body.style.cssText = 'margin:0;background-color:#000;overflow:hidden';
 
 x = ceil(w * random());
 y = ceil(h * random());
+
+// win.setInterval(render, frequency);
 
 // toggle animation on any mouse click or key press
 (canvas.onclick = doc.onkeydown = function(){
