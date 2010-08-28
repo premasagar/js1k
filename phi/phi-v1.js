@@ -10,7 +10,7 @@ var win = this,
     
     // Modifiers
     factor = PHI, //1 + PHI / (PHI * PHI),
-    dirX = 1,
+    dirX = 0,
     dirY = dirX,
     minX = 400,
     minY = minX,
@@ -36,7 +36,7 @@ var win = this,
     toneSeed = random(),
     tone = toneSeed >= .5 ?
         0 : // r
-        toneSeed <= .3 ?
+        toneSeed <= .4 ?
         1 : // g
         2,  // b
     
@@ -45,8 +45,7 @@ var win = this,
     stroke = 'stroke',
     strokeStyle = stroke + 'Style',
     beginPath = 'beginPath',
-    closePath = 'closePath',
-    click = 'onclick';
+    closePath = 'closePath';
     
 function draw(){
     var drift = random() + phi / 2,
@@ -63,21 +62,21 @@ function draw(){
     
     // direction & coords
     if (x > w - maxRadius / 2){
-        dirX = -dirX;
+        dirX = ~dirX;
     }
     if (y > h - maxRadius / 2){
-        dirY = -dirY;
+        dirY = ~dirY;
     }
     if (x <= minX){
         x = minX;
-        dirX = 1;
+        dirX = 0;
     }
     if (y <= minY){
         y = minY;
-        dirY = 1;
+        dirY = 0;
     }
-    x = ceil(dirX > 0 ? x * factor : (x / factor) * drift);
-    y = ceil(dirY > 0 ? y * factor : (y / factor) * drift);
+    x = ceil(dirX ? x / factor * drift : x * factor);
+    y = ceil(dirY ? y / factor * drift : y * factor);
     
     // intensity
     intensity = x / w;
@@ -123,10 +122,9 @@ function render(){
     
     // draw connecting lines
     ctx[beginPath]();
-    xy = coords[0];
-    ctx.moveTo(xy[0], xy[1]);
-    
-    for (i = steps; i; i--){
+    xy = coords[--i];
+    ctx.moveTo(xy[0], xy[1]);    
+    for (; i; i--){
         xy = coords[i-1];
         ctx.lineTo(xy[0], xy[1]);
     }
@@ -141,11 +139,8 @@ x = ceil(w * random());
 y = ceil(h * random());
 
 // toggle animation on any mouse click or key press
-canvas[click] = doc.onkeydown = function(event){
+(canvas.onclick = doc.onkeydown = function(){
     intervalRef = intervalRef ?
         win.clearInterval(intervalRef) :    // clearInterval and set intervalRef to undefined
         win.setInterval(render, frequency);  // setInterval and create reference to it
-};
-
-// start animation
-canvas[click]();
+})(); // start animation
