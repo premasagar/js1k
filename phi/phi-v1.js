@@ -1,3 +1,8 @@
+// random integer: call it with the length of an array, to return a random index, or if no argument suppplied, then it returns 0 or 1
+function randomInt(length){
+    return ceil((length || 2) * random()) - 1;
+}
+
 var win = this,
 
     // Maths
@@ -10,8 +15,7 @@ var win = this,
     
     // Modifiers
     factor = PHI, //1 + PHI / (PHI * PHI),
-    dirX = 0,
-    dirY = dirX,
+    dirX, dirY, // flags to be bitwise toggled
     minX = 400,
     minY = minX,
     maxRadius = 100,
@@ -33,12 +37,7 @@ var win = this,
     
     // Color
     colors = [],
-    toneSeed = random(),
-    tone = toneSeed >= .5 ?
-        0 : // r
-        toneSeed <= .4 ?
-        1 : // g
-        2,  // b
+    tone = randomInt(3),
     
     // String lookups
     length = 'length',
@@ -47,7 +46,7 @@ var win = this,
     strokeStyle = stroke + 'Style',
     beginPath = 'beginPath',
     closePath = 'closePath';
-    
+
 function drawCircles(){
     var drift = random() + phi / 2,
         intenseColor = random() > .5, // in this loop, should the color be intense or not?
@@ -155,6 +154,6 @@ y = ceil(h * random());
 // toggle animation on any mouse click or key press
 (canvas.onclick = doc.onkeydown = function(){
     intervalRef = intervalRef ?
-        win.clearInterval(intervalRef) :    // clearInterval and set intervalRef to undefined
-        win.setInterval(render, frequency);  // setInterval and create reference to it
+        clearInterval(intervalRef) :    // clearInterval and set intervalRef to undefined
+        setInterval(render, frequency);  // setInterval and create reference to it
 })(); // start animation
