@@ -7,8 +7,8 @@ var // Maths
     random = M.random,
     
     // Settings
-    fps = 1,
-    steps = 1,
+    fps = 25,
+    units = 10,
     multiplier = 0.1,
     maxDriftFactor = PHI / 100, // factor of canvas dimensions
     
@@ -17,23 +17,26 @@ var // Maths
     doc = document,
     canvas = doc.getElementById('c'),
     ctx = canvas.getContext('2d'),
-    w = canvas.width = win.innerWidth,
-    h = canvas.height = win.innerHeight,    
+    width = canvas.width = win.innerWidth,
+    height = canvas.height = win.innerHeight,    
     
     // Modifiers
-    frequency = 1 / fps,
     factor = multiplier * phi,
-    maxDriftX = w * maxDriftFactor,
-    maxDriftY = h * maxDriftFactor,
+    maxDriftX = width * maxDriftFactor,
+    maxDriftY = height * maxDriftFactor,
+    maxRadius = width * PHI / 100,
     
-    // Initialise
-    x = randomInt(w - maxDriftX + 1),
-    y = randomInt(h - maxDriftY + 1),
-    xFactor = x * factor,
-    yFactor = y * factor,
-    dirX, dirY, driftX, driftY,
-    intervalRef;
-
+    // Timeline
+    frequency = 1 / fps,
+    intervalRef
+    
+    // String lookups
+    //length = 'length',
+    rgba = 'rgba(',
+    stroke = 'stroke',
+    strokeStyle = stroke + 'Style',
+    beginPath = 'beginPath',
+    closePath = 'closePath';
 
 // **
 
@@ -45,33 +48,63 @@ function drift(maxDrift){
     return ceil(random() * (maxDrift * 2 + 1) - maxDrift / 2 - 1);
 }
 
-function step(){
+function circle(x, y, intensity){
+    var intensity = x / width * (y / height) / 2, // x, y position, in relation to the available width and height
+        radius = ceil(intensity * maxRadius); // TODO, add randomness
+    
+    // create paths
+    ctx[beginPath]();
+    ctx.arc(x, y, radius, 0, M.PI * 2, 0);
+    ctx[closePath]();
+    
+    // styles
+    //rbgStr = rgba + r + ',' + g + ',' + b + ',';
+    //ctx[strokeStyle] = rbgStr + phi * drift +')';
+    //ctx.fillStyle = rbgStr + (phi * phi * phi * drift) +')';
+    
+    // draw
+    ctx[stroke]();
+    ctx.fill();
+}
+
+function unit(){
+    var x = randomInt(width - maxDriftX + 1),
+        y = randomInt(height - maxDriftY + 1),
+        factorX, factorY,
+        directionX, directionY,
+        driftX, driftY;
+    
+    // Randomise
     driftX = drift(maxDriftX);
     driftY = drift(maxDriftY);
 
-    x = ceil(x + (dirX ? xFactor : -xFactor) + driftX);
-    y = ceil(y + (dirY ? yFactor : -yFactor) + driftY);
+    // Calculate new position
+    factorX = x * factor;
+    factorY = y * factor;
+    x = ceil(x + (directionX ? factorX : -factorX) + driftX);
+    y = ceil(y + (directionY ? factorY : -factorY) + driftY);
 
-    if (x > w || x < 0){
-        x = x > w ?
-            2 * w - x :
+    // Wrap around at boundaries to the canvas width and height
+    if (x > width || x < 0){
+        x = x > width ?
+            2 * width - x :
             0 - x;
-        dirX = ~dirX;
+        directionX = ~directionX; // swich bits, to reverse the direction
     }
-
-    if (y > h || y < 0){
-        y = y > h ?
-            2 * h - y :
+    if (y > height || y < 0){
+        y = y > height ?
+            2 * height - y :
             0 - y;
-        dirY = ~dirY;
+        directionY = ~directionY;
     }
     
-    _(x, y);
+    // draw
+    circle(x, y);
 }
 
 function frame(){
-    for (var i = steps; i; i--){
-        step();
+    for (var i = units; i; i--){
+        unit();
     }
 }
 
