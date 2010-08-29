@@ -41,13 +41,14 @@ var win = this,
         2,  // b
     
     // String lookups
+    length = 'length',
     rgba = 'rgba(',
     stroke = 'stroke',
     strokeStyle = stroke + 'Style',
     beginPath = 'beginPath',
     closePath = 'closePath';
     
-function draw(){
+function drawCircles(){
     var drift = random() + phi / 2,
         intenseColor = random() > .5, // in this loop, should the color be intense or not?
         intensity, radius, posX, posY, rbgStr, r, g, b;
@@ -114,25 +115,32 @@ function draw(){
     return [posX, posY];
 }
 
-function drawLines(coords){
-
-}
-
-function render(){
-    // draw circles, in a number of steps
-    for (var coords = [], i = 0, xy; i < steps; i++){
-        coords[i] = draw();
-    }
-    
+function drawLines(coords){ // i === coords.length
+    var i = coords[length] - 1,
+        xy = coords[i];
     // draw connecting lines
     ctx[beginPath]();
-    xy = coords[--i];
     ctx.moveTo(xy[0], xy[1]);    
     for (; i; i--){
         xy = coords[i-1];
         ctx.lineTo(xy[0], xy[1]);
     }
     ctx[closePath]();
+}
+
+function render(){
+    // draw circles, in a number of steps
+    for (var coords = [], i = 0, xy; i < steps; i++){
+        coords[i] = drawCircles();
+    }
+    
+    // white lines (don't do it)
+    drawLines(coords.slice(0,2));
+    ctx[strokeStyle] = rgba + '100,100,100,.1)';
+    ctx[stroke]();
+    
+    // black
+    drawLines(coords);
     ctx[strokeStyle] = rgba + '0,0,0,.1)';
     ctx[stroke]();
 }
