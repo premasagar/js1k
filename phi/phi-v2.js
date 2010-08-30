@@ -51,9 +51,11 @@ function drift(maxDrift){
 }
 
 function circle(x, y, intensity){
+    var radius = (maxRadius / 2) + drift(maxRadius);
+
     // create paths
     ctx[beginPath]();
-    ctx.arc(x, y, ceil(intensity * maxRadius), 0, M.PI * 2, 0);
+    ctx.arc(x, y, ceil(intensity * radius), 0, M.PI * 2, 0);
     ctx[closePath]();
 }
 
@@ -72,16 +74,17 @@ function lines(units){ // i === coords.length
 }
 
 function unit(){
+    function color(which){
+        return ceil(tone === which ? RGBMAX : randomInt(RGBMAX));
+    }
+
     var x = randomInt(width - maxDriftX + 1),
         y = randomInt(height - maxDriftY + 1),
         factorX, factorY,
         directionX, directionY,
         driftX, driftY,
         intensity,
-        r = tone === 0 ? RGBMAX : randomInt(RGBMAX),
-        g = tone === 1 ? RGBMAX : randomInt(RGBMAX),
-        b = tone === 2 ? RGBMAX : randomInt(RGBMAX),
-        rgbStr = rgba + r + ',' + g + ',' + b + ',';
+        rgbStr;
         
     // Randomise
     driftX = drift(maxDriftX);
@@ -112,9 +115,7 @@ function unit(){
     
     intensity = ((x / width) + (y / height)) / 2; // x, y position, in relation to the available width and height
     circle(x, y, intensity);
-    r = r * intensity;
-    g = g * intensity;
-    b = b * intensity;
+    rgbStr = rgba + color(0) + ',' + color(1) + ',' + color(2) + ',';
     
     // styles
     ctx[strokeStyle] = rgbStr + (phi * intensity) +')';
