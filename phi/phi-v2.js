@@ -7,12 +7,6 @@ var // Maths
     random = M.random,
     pow = M.pow,
     
-    // Settings
-    fps = PHI * 10,
-    unitsPerFrame = phi * 100,
-    multiplier = 1,
-    maxDriftFactor = PHI / Infinity, // factor of canvas dimensions
-    
     // Window & document
     win = this,
     doc = document,
@@ -21,12 +15,19 @@ var // Maths
     width = canvas.width = win.innerWidth,
     height = canvas.height = win.innerHeight,    
     
+    // Settings
+    fps = PHI * 10,
+    unitsPerFrame = phi * 100,
+    multiplier = 1,
+    maxDriftFactor = 1, // factor of canvas dimensions - should be 0 to 1
+    maxRadiusFactor = phi, // should be 0 to 1
+    
     // Modifiers
     factor = 1 + (1 / multiplier * phi),
     maxDriftX = width * maxDriftFactor,
     maxDriftY = height * maxDriftFactor,
-    maxRadius = width * pow(phi, phi * 16),
     tone = randomInt(3),
+    maxRadius = width * pow(phi, phi * (20 - (maxRadiusFactor * 10))), // should be pow(phi, phi * 10) to pow(phi, phi * 16)
     
     // Timeline
     frequency = 1000 / fps,
@@ -51,11 +52,9 @@ function drift(maxDrift){
 }
 
 function circle(x, y, intensity){
-    var radius = (maxRadius / 2) + drift(maxRadius);
-
     // create paths
     ctx[beginPath]();
-    ctx.arc(x, y, ceil(intensity * radius), 0, M.PI * 2, 0);
+    ctx.arc(x, y, ceil(random() * intensity * maxRadius), 0, M.PI * 2, 0);
     ctx[closePath]();
 }
 
@@ -110,21 +109,20 @@ function unit(){
             0 - y;
         directionY = ~directionY;
     }
-    x = x * PHI;
-    y = y * PHI;
+    //x = x * PHI;
+    //y = y * PHI;
     
     intensity = ((x / width) + (y / height)) / 2; // x, y position, in relation to the available width and height
     circle(x, y, intensity);
     rgbStr = rgba + color(0) + ',' + color(1) + ',' + color(2) + ',';
     
     // styles
-    ctx[strokeStyle] = rgbStr + (phi * intensity) +')';
+    ctx[strokeStyle] = rgbStr + (intensity) +')';
     ctx.fillStyle = rgbStr + (phi / PHI * intensity) +')';
     
     // draw
     ctx[stroke]();
     ctx.fill();
-    
     return [x, y, intensity, rgbStr];
 }
 
@@ -137,20 +135,20 @@ function frame(){
     
     // white lines (don't do it)
     lines(units.slice(0,2));
-    ctx[strokeStyle] = units[0][3] + (phi * phi * units[0][2]) +')';
+    ctx[strokeStyle] = units[0][3] + (units[0][2] * (maxRadiusFactor / 2)) +')';
     ctx[stroke]();
     
-    if (!randomInt(3)){
+    if (randomInt(PHI)){
         window.setTimeout(function(){
             lines(units.slice(0,2));
-            ctx[strokeStyle] = rgba + '0,0,0,' + (phi * phi * phi * units[0][2]) + ')';
+            ctx[strokeStyle] = rgba + '0,0,0,' + (units[0][2] * maxRadiusFactor) + ')';
             ctx[stroke]();
         }, PHI * 1000);
     }
     
     // black
     lines(units.slice(2));
-    ctx[strokeStyle] = rgba + '0,0,0,' + phi * units[2][2] + ')';
+    ctx[strokeStyle] = rgba + '0,0,0,' + phi * units[2][2] * maxRadiusFactor + ')';
     ctx[stroke]();
 }
 
