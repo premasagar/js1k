@@ -5,6 +5,7 @@ var // Maths
     RGBMAX = 255,
     ceil = M.ceil,
     random = M.random,
+    pow = M.pow,
     
     // Settings
     fps = 25,
@@ -24,7 +25,7 @@ var // Maths
     factor = multiplier * phi,
     maxDriftX = width * maxDriftFactor,
     maxDriftY = height * maxDriftFactor,
-    maxRadius = width * PHI / 100,
+    maxRadius = width * pow(phi, PHI * M.PI),
     
     // Timeline
     frequency = 1 / fps,
