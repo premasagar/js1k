@@ -139,7 +139,7 @@ function frame(){
     
     // black
     lines(units.slice(2));
-    ctx[strokeStyle] = rgba + '0,0,0,' + units[2][2] + ')';
+    ctx[strokeStyle] = rgba + '0,0,0,' + phi * phi * units[2][2] + ')';
     ctx[stroke]();
 }
 
