@@ -10,7 +10,7 @@ var // Maths
     // Settings
     fps = PHI,
     unitsPerFrame = phi * 100,
-    multiplier = 10,
+    multiplier = 1,
     maxDriftFactor = PHI / Infinity, // factor of canvas dimensions
     
     // Window & document
@@ -22,10 +22,10 @@ var // Maths
     height = canvas.height = win.innerHeight,    
     
     // Modifiers
-    factor = multiplier * phi,
+    factor = 1 + (1 / multiplier * phi),
     maxDriftX = width * maxDriftFactor,
     maxDriftY = height * maxDriftFactor,
-    maxRadius = width * pow(phi, phi * 10),
+    maxRadius = width * pow(phi, phi * 16),
     
     // Timeline
     frequency = 1 / fps,
@@ -66,8 +66,8 @@ function circle(x, y, intensity){
     //ctx[strokeStyle] = rbgStr + phi * drift +')';
     //ctx.fillStyle = rbgStr + (phi * phi * phi * drift) +')';
     rbgStr = rgba + r + ',' + g + ',' + b + ',';
-    ctx[strokeStyle] = rbgStr + intensity +')';
-    ctx.fillStyle = rbgStr + (phi * intensity) +')';
+    ctx[strokeStyle] = rbgStr + (phi * intensity) +')';
+    ctx.fillStyle = rbgStr + (phi / PHI * intensity) +')';
     
     // draw
     ctx[stroke]();
@@ -103,6 +103,7 @@ function unit(){
     // Calculate new position
     factorX = x * factor;
     factorY = y * factor;
+    
     x = ceil(x + (directionX ? factorX : -factorX) + driftX);
     y = ceil(y + (directionY ? factorY : -factorY) + driftY);
 
@@ -119,7 +120,11 @@ function unit(){
             0 - y;
         directionY = ~directionY;
     }
-    intensity = x / width * (y / height) / 2; // x, y position, in relation to the available width and height
+    x = x * PHI;
+    y = y * PHI;
+    
+    intensity = ((x / width) + (y / height)) / 2; // x, y position, in relation to the available width and height
+    _(x, y, intensity);
     circle(x, y, intensity);
     
     return [x, y, intensity];
@@ -137,9 +142,19 @@ function frame(){
     ctx[strokeStyle] = rgba + '100,100,100,' + phi * units[0][2] + ')';
     ctx[stroke]();
     
+    /*
+    if (!randomInt(3)){
+        window.setTimeout(function(){
+            lines(units.slice(0,2));
+            ctx[strokeStyle] = rgba + '0,0,0,' + units[0][2] + ')';
+            ctx[stroke]();
+        }, 1000);
+    }
+    */
+    
     // black
     lines(units.slice(2));
-    ctx[strokeStyle] = rgba + '0,0,0,' + phi * phi * units[2][2] + ')';
+    ctx[strokeStyle] = rgba + '0,0,0,' + phi * units[2][2] + ')';
     ctx[stroke]();
 }
 
