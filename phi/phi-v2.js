@@ -18,8 +18,8 @@ var // Maths
     // Settings
     fps = PHI * 10,
     unitsPerFrame = phi * 100,
-    multiplier = 1,
-    maxDriftFactor = 1, // factor of canvas dimensions - should be 0 to 1
+    multiplier = phi,
+    maxDriftFactor = 0, //phi + phi / 10, // factor of canvas dimensions - should be 0 to 1
     maxRadiusFactor = phi, // should be 0 to 1
     
     // Modifiers
@@ -83,6 +83,9 @@ function unit(){
         directionX, directionY,
         driftX, driftY,
         intensity,
+        r = color(0),
+        g = color(1),
+        b = color(2),
         rgbStr;
         
     // Randomise
@@ -114,11 +117,11 @@ function unit(){
     
     intensity = ((x / width) + (y / height)) / 2; // x, y position, in relation to the available width and height
     circle(x, y, intensity);
-    rgbStr = rgba + color(0) + ',' + color(1) + ',' + color(2) + ',';
     
     // styles
-    ctx[strokeStyle] = rgbStr + (intensity) +')';
-    ctx.fillStyle = rgbStr + (phi / PHI * intensity) +')';
+    rgbStr = rgba + ceil(r * phi) + ',' + ceil(g * phi) + ',' + ceil(b * phi) + ',' + (phi / PHI * intensity) +')';
+    ctx[strokeStyle] = rgbStr;
+    ctx.fillStyle = rgba + r + ',' + g + ',' + b + ',' + (phi * intensity) +')';
     
     // draw
     ctx[stroke]();
@@ -135,7 +138,8 @@ function frame(){
     
     // white lines (don't do it)
     lines(units.slice(0,2));
-    ctx[strokeStyle] = units[0][3] + (units[0][2] * (maxRadiusFactor / 2)) +')';
+    ctx[strokeStyle] = units[0][3];
+    _(units[0][3]);
     ctx[stroke]();
     
     if (randomInt(PHI)){
