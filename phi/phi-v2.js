@@ -139,7 +139,7 @@ function frame(){
     
     // white lines (don't do it)
     lines(units.slice(0,2));
-    ctx[strokeStyle] = rgba + '100,100,100,' + phi * units[0][2] + ')';
+    ctx[strokeStyle] = rgba + RGBMAX + ',' + RGBMAX + ',' + RGBMAX + ',' + phi * phi * units[0][2] + ')';
     ctx[stroke]();
     
     /*
