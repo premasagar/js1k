@@ -9,7 +9,7 @@ var // Maths
     
     // Settings
     fps = 25,
-    units = 10,
+    units = 25,
     multiplier = 0,
     maxDriftFactor = PHI / 100, // factor of canvas dimensions
     
@@ -25,7 +25,7 @@ var // Maths
     factor = multiplier * phi,
     maxDriftX = width * maxDriftFactor,
     maxDriftY = height * maxDriftFactor,
-    maxRadius = width * pow(phi, PHI * M.PI),
+    maxRadius = width * pow(phi, 9),
     
     // Timeline
     frequency = 1 / fps,
