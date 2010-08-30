@@ -8,8 +8,8 @@ var // Maths
     pow = M.pow,
     
     // Settings
-    fps = 25,
-    unitsPerFrame = 5,
+    fps = PHI,
+    unitsPerFrame = phi * 100,
     multiplier = 0,
     maxDriftFactor = PHI / Infinity, // factor of canvas dimensions
     
