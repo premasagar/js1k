@@ -8,7 +8,7 @@ var // Maths
     pow = M.pow,
     
     // Settings
-    fps = PHI,
+    fps = PHI * 10,
     unitsPerFrame = phi * 100,
     multiplier = 1,
     maxDriftFactor = PHI / Infinity, // factor of canvas dimensions
@@ -28,7 +28,7 @@ var // Maths
     maxRadius = width * pow(phi, phi * 16),
     
     // Timeline
-    frequency = 1 / fps,
+    frequency = 1000 / fps,
     intervalRef,
     
     // String lookups
