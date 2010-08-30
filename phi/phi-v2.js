@@ -9,7 +9,7 @@ var // Maths
     // Settings
     fps = 25,
     units = 10,
-    multiplier = 0.1,
+    multiplier = 0,
     maxDriftFactor = PHI / 100, // factor of canvas dimensions
     
     // Window & document
@@ -28,7 +28,7 @@ var // Maths
     
     // Timeline
     frequency = 1 / fps,
-    intervalRef
+    intervalRef,
     
     // String lookups
     //length = 'length',
@@ -50,7 +50,11 @@ function drift(maxDrift){
 
 function circle(x, y, intensity){
     var intensity = x / width * (y / height) / 2, // x, y position, in relation to the available width and height
-        radius = ceil(intensity * maxRadius); // TODO, add randomness
+        radius = ceil(intensity * maxRadius),
+        r = RGBMAX,
+        g = RGBMAX,
+        b = RGBMAX,
+        rgbStr;
     
     // create paths
     ctx[beginPath]();
@@ -61,6 +65,9 @@ function circle(x, y, intensity){
     //rbgStr = rgba + r + ',' + g + ',' + b + ',';
     //ctx[strokeStyle] = rbgStr + phi * drift +')';
     //ctx.fillStyle = rbgStr + (phi * phi * phi * drift) +')';
+    rbgStr = rgba + r + ',' + g + ',' + b + ',';
+    ctx[strokeStyle] = rbgStr + intensity +')';
+    ctx.fillStyle = rbgStr + (phi * intensity) +')';
     
     // draw
     ctx[stroke]();
@@ -107,6 +114,9 @@ function frame(){
         unit();
     }
 }
+
+// Set body style
+doc.body.style.cssText = 'margin:0;background-color:#000;overflow:hidden';
 
 //setInterval(frame, frequency);
 
