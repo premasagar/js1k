@@ -11,7 +11,7 @@ var // Maths
     fps = 25,
     units = 25,
     multiplier = 0,
-    maxDriftFactor = PHI / 100, // factor of canvas dimensions
+    maxDriftFactor = PHI / Infinity, // factor of canvas dimensions
     
     // Window & document
     win = this,
