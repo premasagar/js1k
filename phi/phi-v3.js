@@ -1,5 +1,3 @@
-_(window.innerWidth, window.innerHeight, document.body.clientWidth, document.body.clientHeight);
-
 var // Maths
     M = Math,
     phi = .618,
@@ -19,8 +17,8 @@ var // Maths
     height = canvas.height = win.innerHeight,    
     
     // Settings
-    fps = PHI * 10,
-    unitsPerFrame = phi * 100,
+    fps = PHI * PHI * 100,
+    unitsPerFrame = phi * 10,
     multiplier = phi,
     maxRadiusFactor = phi, // should be 0 to 1
     
@@ -30,7 +28,6 @@ var // Maths
     
     // Timeline
     frequency = 1000 / fps,
-    intervalRef,
     
     // String lookups
     length = 'length',
@@ -39,7 +36,10 @@ var // Maths
     stroke = 'stroke',
     strokeStyle = stroke + 'Style',
     beginPath = 'beginPath',
-    closePath = 'closePath';
+    closePath = 'closePath',
+    
+    // Declarations
+    intensity, factor, radius, rgbStroke, intervalRef, proximity;
 
 // **
 
@@ -65,88 +65,88 @@ function lines(units){ // i === coords.length
     ctx[closePath]();
 }
 
-function unit(){
+function frame(){
     function color(which){
         return ceil(tone === which ? RGBMAX : randomInt(RGBMAX));
     }
-
-    var x = randomInt(width),
-        y = randomInt(height),
-        intensity,
-        r = color(0),
-        g = color(1),
-        b = color(2),
-        factor,
-        radius,
-        rgbStr1 = rgba + r + ',' + g + ',' + b + ',',
-        rgbStr2 = rgba + ceil(r * phiTenth) + ',' + ceil(g * phiTenth) + ',' + ceil(b * phiTenth) + ',',
-        rgbStroke;
     
-    // Calculate new position
-    x = x * PHI;
-    y = y * PHI;
-
-    // Wrap around at boundaries to the canvas width and height
-    if (x > width || x < 0){
-        x = x > width ?
-            2 * width - x :
-            0 - x;
+    function hypotenuse(a, b) {
+        return M.sqrt((a * a) + (b * b));
     }
-    if (y > height || y < 0){
-        y = y > height ?
-            2 * height - y :
-            0 - y;
-    }
-    
-    
-    intensity = ((x / width) + (y / height)) / 2; // x, y position, in relation to the available width and height
-    factor = random() * intensity;
-    
-    // path for circle
-    ctx[beginPath]();
-    ctx.arc(x, y, ceil(factor * maxRadius), 0, M.PI * 2, 0);
-    ctx[closePath]();
-    
-    // styles
-    rgbStroke = (randomInt(PHI) ? rgbStr2 : rgbStr1) + factor +')';
-    ctx[strokeStyle] = rgbStroke;
-    ctx.fillStyle = rgbStr1 + (factor * intensity) +')';
-    
-    // draw
-    ctx[stroke]();
-    ctx.fill();
-    return [x, y, intensity, rgbStroke];
-}
 
-function frame(){
     var units = [],
-        nearOrigin = [(width * phi) + drift(width * (phi / (PHI * 10))), (height * phi) + drift(height * (phi / (PHI * 10)))];
+        driftFactor = pow(phi, 10),
+        driftX = drift(width * driftFactor),
+        driftY = drift(height * driftFactor),
+        lineToCoords = randomInt(PHI * 10) ? // select coordinates to use in this run
+            [(width * phi) + driftX, (height * phi) + driftY] :
+            [randomInt(width), randomInt(height)],
+        firstCoords;
 
+    // Main calculation loop
     for (var i = 0; i < unitsPerFrame; i++){
-        units[i] = unit();
+        x = randomInt(width);
+        y = randomInt(height);
+        r = color(0);
+        g = color(1);
+        b = color(2);
+        rgbStr1 = rgba + r + ',' + g + ',' + b + ',';
+        rgbStr2 = rgba + ceil(r * phiTenth) + ',' + ceil(g * phiTenth) + ',' + ceil(b * phiTenth) + ',';
+        
+        // Calculate new position
+        x = x * PHI;
+        y = y * PHI;
+        
+    /*
+        // Wrap around at boundaries to the canvas width and height
+        if (x > width || x < 0){
+            x = x > width ?
+                2 * width - x :
+                0 - x;
+        }
+        if (y > height || y < 0){
+            y = y > height ?
+                2 * height - y :
+                0 - y;
+        }
+    */    
+        
+        intensity = ((x / width) + (y / height)) / 2; // x, y position, in relation to the available width and height
+        maxProximity = hypotenuse(width, height);
+        proximity = hypotenuse(x - width * phi, y - height * phi) / maxProximity;
+        intensity = 1 - proximity;
+        factor = random() * intensity * intensity;
+        radius = factor * maxRadius;
+        
+        
+        // path for circle
+        ctx[beginPath]();
+        ctx.arc(x, y, ceil(radius), 0, M.PI * 2, 0);
+        ctx[closePath]();
+        
+        // styles
+        rgbStroke = (randomInt(PHI) ? rgbStr2 : rgbStr1) + factor +')';
+        ctx[strokeStyle] = rgbStroke;
+        ctx.fillStyle = rgbStr1 + (factor * intensity) +')';
+        
+        // draw
+        ctx[stroke]();
+        ctx.fill();
+        units[i] = [x, y, intensity, rgbStroke];
     }
+    
+    firstCoords = units[0];
     
     // coloured lines
-    if (true || randomInt(PHI)){
-        lines([units[0], nearOrigin]);
-        ctx[strokeStyle] = units[0][3];
+    if (!randomInt(PHI * 10)){
+        lines([firstCoords, lineToCoords]);
+        ctx[strokeStyle] = firstCoords[3];
         ctx[stroke]();
-        
-        // darken later, sometimes
-        /*
-        if (randomInt(PHI)){
-            setTimeout(function(){
-                lines(firstUnits);
-                ctx[strokeStyle] = rgbaBlack + (units[0][2] * maxRadiusFactor) + ')';
-                ctx[stroke]();
-            }, PHI * 1000);
-        }
-        */
     }
     
     // black
-    lines(units.slice(2));
-    ctx[strokeStyle] = rgbaBlack + (phi * units[2][2] * maxRadiusFactor) + ')';
+    lines(units);
+    ctx[strokeStyle] = rgbaBlack + (phi * firstCoords[2] * maxRadiusFactor) + ')';
     ctx[stroke]();
 }
 
@@ -156,9 +156,11 @@ doc.body.style.cssText = 'margin:0;background:#000;overflow:hidden';
 //setInterval(frame, frequency);
 
 // toggle animation on any mouse click or key press
-(canvas.onclick = doc.onkeydown = function(){
-    intervalRef = intervalRef ?
-        clearInterval(intervalRef) :    // clearInterval and set intervalRef to undefined
-        setInterval(frame, frequency);  // setInterval and create reference to it
+(canvas.onclick = doc.onkeydown = function(event){
+    if (!event || event.which == 1 || event.which == 32){
+        intervalRef = intervalRef ?
+            clearInterval(intervalRef) :    // clearInterval and set intervalRef to undefined
+            setInterval(frame, frequency);  // setInterval and create reference to it
+    }
 })(); // start animation
 
