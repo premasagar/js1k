@@ -2,6 +2,7 @@ var // Maths
     M = Math,
     phi = .618,
     PHI = 1 / phi,
+    phiTenth = phi / 10,
     RGBMAX = 255,
     ceil = M.ceil,
     random = M.random,
@@ -13,21 +14,18 @@ var // Maths
     canvas = doc.getElementById('c'),
     ctx = canvas.getContext('2d'),
     width = canvas.width = win.innerWidth,
-    height = canvas.height = win.innerHeight,    
+    height = canvas.height = win.innerHeight,
     
     // Settings
     fps = PHI * 10,
     unitsPerFrame = phi * 100,
     multiplier = phi,
-    maxDriftFactor = 0, //phi + phi / 10, // factor of canvas dimensions - should be 0 to 1
     maxRadiusFactor = phi, // should be 0 to 1
     
     // Modifiers
-    factor = 1 + (1 / multiplier * phi),
-    maxDriftX = width * maxDriftFactor,
-    maxDriftY = height * maxDriftFactor,
     tone = randomInt(3),
     maxRadius = width * pow(phi, phi * (20 - (maxRadiusFactor * 10))), // should be pow(phi, phi * 10) to pow(phi, phi * 16)
+    burst,
     
     // Timeline
     frequency = 1000 / fps,
@@ -36,6 +34,7 @@ var // Maths
     // String lookups
     length = 'length',
     rgba = 'rgba(',
+    rgbaBlack = rgba + '0,0,0,',
     stroke = 'stroke',
     strokeStyle = stroke + 'Style',
     beginPath = 'beginPath',
@@ -49,13 +48,6 @@ function randomInt(length){
 
 function drift(maxDrift){
     return ceil(random() * (maxDrift * 2 + 1) - maxDrift / 2 - 1);
-}
-
-function circle(x, y, intensity){
-    // create paths
-    ctx[beginPath]();
-    ctx.arc(x, y, ceil(random() * intensity * maxRadius), 0, M.PI * 2, 0);
-    ctx[closePath]();
 }
 
 function lines(units){ // i === coords.length
@@ -74,30 +66,26 @@ function lines(units){ // i === coords.length
 
 function unit(){
     function color(which){
-        return ceil(tone === which ? RGBMAX : randomInt(RGBMAX));
+        return ceil(which == (burst ? randomInt(3) : tone) ? RGBMAX : randomInt(RGBMAX));
     }
 
-    var x = randomInt(width - maxDriftX + 1),
-        y = randomInt(height - maxDriftY + 1),
-        factorX, factorY,
+    var x = randomInt(width),
+        y = randomInt(height),
         directionX, directionY,
         driftX, driftY,
         intensity,
         r = color(0),
         g = color(1),
         b = color(2),
-        rgbStr;
-        
-    // Randomise
-    driftX = drift(maxDriftX);
-    driftY = drift(maxDriftY);
+        factor,
+        radius,
+        rgbStr1 = rgba + r + ',' + g + ',' + b + ',',
+        rgbStr2 = rgba + ceil(r * phiTenth) + ',' + ceil(g * phiTenth) + ',' + ceil(b * phiTenth) + ',',
+        rgbStroke;
 
     // Calculate new position
-    factorX = x * factor;
-    factorY = y * factor;
-    
-    x = ceil(x + (directionX ? factorX : -factorX) + driftX);
-    y = ceil(y + (directionY ? factorY : -factorY) + driftY);
+    x = ceil(x + (directionX ? x : -x) * 2);
+    y = ceil(y + (directionY ? y : -y) * 2);
 
     // Wrap around at boundaries to the canvas width and height
     if (x > width || x < 0){
@@ -112,58 +100,76 @@ function unit(){
             0 - y;
         directionY = ~directionY;
     }
-    //x = x * PHI;
-    //y = y * PHI;
     
-    intensity = ((x / width) + (y / height)) / 2; // x, y position, in relation to the available width and height
-    circle(x, y, intensity);
+    intensity = (((x / width) + (y / height)) / 2); // x, y position, in relation to the available width and height
+    factor = (burst ? random() : random()) * intensity;
+    
+    // path for circle
+    ctx[beginPath]();
+    ctx.arc(x, y, ceil(factor * maxRadius * (burst ? 2 : 1)), 0, M.PI * 2, 0);
+    ctx[closePath]();
     
     // styles
-    rgbStr = rgba + ceil(r * phi) + ',' + ceil(g * phi) + ',' + ceil(b * phi) + ',' + (phi / PHI * intensity) +')';
-    ctx[strokeStyle] = rgbStr;
-    ctx.fillStyle = rgba + r + ',' + g + ',' + b + ',' + (phi * intensity) +')';
+    rgbStroke = (randomInt(PHI) ? rgbStr2 : rgbStr1) + factor +')';
+    ctx[strokeStyle] = rgbStroke;
+    ctx.fillStyle = rgbStr1 + (factor * intensity * (burst ? PHI : 1)) +')';
     
     // draw
     ctx[stroke]();
     ctx.fill();
-    return [x, y, intensity, rgbStr];
+    return [x, y, intensity, rgbStroke];
 }
 
 function frame(){
-    var units = [];
+    var units = [],
+        firstUnits;
 
-    for (var i = 0; i < unitsPerFrame; i++){
+    for (var i = 0; i < unitsPerFrame / (burst ? 2 : 1); i++){
         units[i] = unit();
     }
+    firstUnits = units.slice(0,2)
     
-    // white lines (don't do it)
-    lines(units.slice(0,2));
-    ctx[strokeStyle] = units[0][3];
-    _(units[0][3]);
-    ctx[stroke]();
-    
+    // coloured lines
     if (randomInt(PHI)){
-        window.setTimeout(function(){
-            lines(units.slice(0,2));
-            ctx[strokeStyle] = rgba + '0,0,0,' + (units[0][2] * maxRadiusFactor) + ')';
-            ctx[stroke]();
-        }, PHI * 1000);
+        lines(firstUnits);
+        ctx[strokeStyle] = units[0][3];
+        ctx[stroke]();
+        
+        // darken later, sometimes
+        /*
+        if (randomInt(PHI)){
+            setTimeout(function(){
+                lines(firstUnits);
+                ctx[strokeStyle] = rgbaBlack + (units[0][2] * maxRadiusFactor) + ')';
+                ctx[stroke]();
+            }, PHI * 1000);
+        }
+        */
     }
     
     // black
     lines(units.slice(2));
-    ctx[strokeStyle] = rgba + '0,0,0,' + phi * units[2][2] * maxRadiusFactor + ')';
+    ctx[strokeStyle] = rgbaBlack + (phi * units[2][2] * maxRadiusFactor) + ')';
     ctx[stroke]();
 }
 
 // Set body style
 doc.body.style.cssText = 'margin:0;background-color:#000;overflow:hidden';
 
+canvas.onmousedown = function(){
+    burst = 1;
+};
+canvas.onmouseup = function(){
+    burst = 0;
+};
+
+
 //setInterval(frame, frequency);
 
 // toggle animation on any mouse click or key press
-(canvas.onclick = doc.onkeydown = function(){
+(doc.onkeydown = function(){
     intervalRef = intervalRef ?
         clearInterval(intervalRef) :    // clearInterval and set intervalRef to undefined
         setInterval(frame, frequency);  // setInterval and create reference to it
 })(); // start animation
+
