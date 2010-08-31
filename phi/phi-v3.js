@@ -81,7 +81,7 @@ function unit(){
         rgbStr1 = rgba + r + ',' + g + ',' + b + ',',
         rgbStr2 = rgba + ceil(r * phiTenth) + ',' + ceil(g * phiTenth) + ',' + ceil(b * phiTenth) + ',',
         rgbStroke;
-
+    
     // Calculate new position
     x = x * PHI;
     y = y * PHI;
@@ -97,6 +97,7 @@ function unit(){
             2 * height - y :
             0 - y;
     }
+    
     
     intensity = ((x / width) + (y / height)) / 2; // x, y position, in relation to the available width and height
     factor = random() * intensity;
@@ -119,16 +120,15 @@ function unit(){
 
 function frame(){
     var units = [],
-        firstUnits;
+        nearOrigin = [(width * phi) + drift(width * (phi / (PHI * 10))), (height * phi) + drift(height * (phi / (PHI * 10)))];
 
     for (var i = 0; i < unitsPerFrame; i++){
         units[i] = unit();
     }
-    firstUnits = units.slice(0,2);
     
     // coloured lines
-    if (randomInt(PHI)){
-        lines(firstUnits);
+    if (true || randomInt(PHI)){
+        lines([units[0], nearOrigin]);
         ctx[strokeStyle] = units[0][3];
         ctx[stroke]();
         
@@ -153,12 +153,12 @@ function frame(){
 // Set body style
 doc.body.style.cssText = 'margin:0;background:#000;overflow:hidden';
 
-setInterval(frame, frequency);
-/*
+//setInterval(frame, frequency);
+
 // toggle animation on any mouse click or key press
 (canvas.onclick = doc.onkeydown = function(){
     intervalRef = intervalRef ?
         clearInterval(intervalRef) :    // clearInterval and set intervalRef to undefined
         setInterval(frame, frequency);  // setInterval and create reference to it
 })(); // start animation
-*/
+
