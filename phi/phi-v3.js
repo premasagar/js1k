@@ -115,8 +115,8 @@ function frame(){
         maxProximity = hypotenuse(width, height);
         proximity = hypotenuse(x - width * phi, y - height * phi) / maxProximity;
         intensity = 1 - proximity;
-        factor = random() * intensity * intensity;
-        radius = factor * maxRadius;
+        factor = random() * intensity * (intensity / PHI);
+        radius = maxRadius * (randomInt(pow(PHI, phi * 10)) ? factor * PHI : (1 - factor * phi));
         
         
         // path for circle
