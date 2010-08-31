@@ -1,3 +1,5 @@
+_(window.innerWidth, window.innerHeight, document.body.clientWidth, document.body.clientHeight);
+
 var // Maths
     M = Math,
     phi = .618,
@@ -149,7 +151,7 @@ function frame(){
 }
 
 // Set body style
-doc.body.style.cssText = 'margin:0;background-color:#000;overflow:hidden';
+doc.body.style.cssText = 'margin:0;background:#000;overflow:hidden';
 
 setInterval(frame, frequency);
 /*
