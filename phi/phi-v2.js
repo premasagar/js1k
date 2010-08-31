@@ -14,7 +14,7 @@ var // Maths
     canvas = doc.getElementById('c'),
     ctx = canvas.getContext('2d'),
     width = canvas.width = win.innerWidth,
-    height = canvas.height = win.innerHeight,
+    height = canvas.height = win.innerHeight,    
     
     // Settings
     fps = PHI * 10,
@@ -25,7 +25,6 @@ var // Maths
     // Modifiers
     tone = randomInt(3),
     maxRadius = width * pow(phi, phi * (20 - (maxRadiusFactor * 10))), // should be pow(phi, phi * 10) to pow(phi, phi * 16)
-    burst,
     
     // Timeline
     frequency = 1000 / fps,
@@ -66,13 +65,11 @@ function lines(units){ // i === coords.length
 
 function unit(){
     function color(which){
-        return ceil(which == (burst ? randomInt(3) : tone) ? RGBMAX : randomInt(RGBMAX));
+        return ceil(tone === which ? RGBMAX : randomInt(RGBMAX));
     }
 
     var x = randomInt(width),
         y = randomInt(height),
-        directionX, directionY,
-        driftX, driftY,
         intensity,
         r = color(0),
         g = color(1),
@@ -84,35 +81,33 @@ function unit(){
         rgbStroke;
 
     // Calculate new position
-    x = ceil(x + (directionX ? x : -x) * 2);
-    y = ceil(y + (directionY ? y : -y) * 2);
+    x = x * PHI;
+    y = y * PHI;
 
     // Wrap around at boundaries to the canvas width and height
     if (x > width || x < 0){
         x = x > width ?
             2 * width - x :
             0 - x;
-        directionX = ~directionX; // swich bits, to reverse the direction
     }
     if (y > height || y < 0){
         y = y > height ?
             2 * height - y :
             0 - y;
-        directionY = ~directionY;
     }
     
-    intensity = (((x / width) + (y / height)) / 2); // x, y position, in relation to the available width and height
-    factor = (burst ? random() : random()) * intensity;
+    intensity = ((x / width) + (y / height)) / 2; // x, y position, in relation to the available width and height
+    factor = random() * intensity;
     
     // path for circle
     ctx[beginPath]();
-    ctx.arc(x, y, ceil(factor * maxRadius * (burst ? 2 : 1)), 0, M.PI * 2, 0);
+    ctx.arc(x, y, ceil(factor * maxRadius), 0, M.PI * 2, 0);
     ctx[closePath]();
     
     // styles
     rgbStroke = (randomInt(PHI) ? rgbStr2 : rgbStr1) + factor +')';
     ctx[strokeStyle] = rgbStroke;
-    ctx.fillStyle = rgbStr1 + (factor * intensity * (burst ? PHI : 1)) +')';
+    ctx.fillStyle = rgbStr1 + (factor * intensity) +')';
     
     // draw
     ctx[stroke]();
@@ -124,7 +119,7 @@ function frame(){
     var units = [],
         firstUnits;
 
-    for (var i = 0; i < unitsPerFrame / (burst ? 2 : 1); i++){
+    for (var i = 0; i < unitsPerFrame; i++){
         units[i] = unit();
     }
     firstUnits = units.slice(0,2)
@@ -156,18 +151,10 @@ function frame(){
 // Set body style
 doc.body.style.cssText = 'margin:0;background-color:#000;overflow:hidden';
 
-canvas.onmousedown = function(){
-    burst = 1;
-};
-canvas.onmouseup = function(){
-    burst = 0;
-};
-
-
 //setInterval(frame, frequency);
 
 // toggle animation on any mouse click or key press
-(doc.onkeydown = function(){
+(canvas.onclick = doc.onkeydown = function(){
     intervalRef = intervalRef ?
         clearInterval(intervalRef) :    // clearInterval and set intervalRef to undefined
         setInterval(frame, frequency);  // setInterval and create reference to it
