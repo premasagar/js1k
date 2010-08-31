@@ -151,12 +151,12 @@ function frame(){
 // Set body style
 doc.body.style.cssText = 'margin:0;background-color:#000;overflow:hidden';
 
-//setInterval(frame, frequency);
-
+setInterval(frame, frequency);
+/*
 // toggle animation on any mouse click or key press
 (canvas.onclick = doc.onkeydown = function(){
     intervalRef = intervalRef ?
         clearInterval(intervalRef) :    // clearInterval and set intervalRef to undefined
         setInterval(frame, frequency);  // setInterval and create reference to it
 })(); // start animation
-
+*/
