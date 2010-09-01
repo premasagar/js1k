@@ -24,7 +24,7 @@ var // Window & document
     // Settings
     frequency = 10,
     unitsPerFrame = PHIten * PHI,
-    driftFactor = PHI / 100,
+    driftFactor = PHI / 99,
     driftFactorWidth = width * driftFactor,
     driftFactorHeight = height * driftFactor,
     maxProximity = hypotenuse(width, height),
@@ -130,7 +130,8 @@ function frame(){
 }
 
 // Set body style
-doc.body.style.cssText = 'margin:0;background:#000;overflow:hidden';
+//doc.body.style.cssText = 'margin:0;background:#000;overflow:hidden';
+doc.body.style.background = '#000';
 
 setInterval(frame, frequency);
 /*
