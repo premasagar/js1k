@@ -23,9 +23,8 @@ var // Window & document
     powPHI = pow(PHI, phiTen),
     
     // Settings
-    fps = PHIten,
-    unitsPerFrame = PHIten * 10,
-    multiplier = phi,
+    fps = PHIten * phiTen,
+    unitsPerFrame = PHIten * PHI,
     maxRadiusFactor = phi, // should be 0 to 1
     driftFactor = pow(phi, 10),
     driftFactorWidth = width * driftFactor,
@@ -47,9 +46,10 @@ var // Window & document
     strokeStyle = stroke + 'Style',
     beginPath = 'beginPath',
     closePath = 'closePath',
+    units = [],
     
     // Declarations
-    intensity, factor, radius, rgbStroke, proximity, firstCoords, i, x, y, r, g, b, rgbStr1, rgbStr2, units, driftX, driftY, lineToCoords, comparisonColor, xy;
+    intensity, factor, radius, rgbStroke, proximity, firstCoords, i, x, y, r, g, b, rgbStr1, rgbStr2, driftX, driftY, lineToCoords, comparisonColor, xy;
 
 // **
     
@@ -66,14 +66,13 @@ function drift(maxDrift){
 }
 
 function lines(units){ // i === coords.length
-    i = units[len] - 1;
-    xy = units[i];
+    xy = units[i = units[len] - 1];
         
     // draw connecting lines
     ctx[beginPath]();
     ctx.moveTo(xy[0], xy[1]);    
     for (; i; i--){
-        xy = units[i-1];
+        xy = units[i - 1];
         ctx.lineTo(xy[0], xy[1]);
     }
     ctx[closePath]();
@@ -84,7 +83,7 @@ function frame(){
         return which == tone ? (proximity < phiTenth ? RGBMAX : (proximity < phi * phi ? randomInt(61) + 195 : randomInt(98) + 158)) : randomInt(RGBMAX);
     }
     
-    units = [];
+    units[len] = 0;
     driftX = drift(driftFactorWidth);
     driftY = drift(driftFactorHeight);
     lineToCoords = randomInt(PHIten) ? // select coordinates to use in this run
@@ -93,12 +92,8 @@ function frame(){
 
     // Main calculation loop
     for (i = 0; i < unitsPerFrame; i++){
-        x = randomInt(width);
-        y = randomInt(height);
-        
-        // Calculate new position
-        x = x * PHI;
-        y = y * PHI;
+        x = randomInt(width / PHI) * PHI;
+        y = randomInt(height / PHI) * PHI;
         
         // Intensity
         proximity = hypotenuse(x - phiWidth, y - phiHeight) / maxProximity;
@@ -111,7 +106,7 @@ function frame(){
         g = color(1);
         b = color(2);
         rgbStr1 = rgba + r + ',' + g + ',' + b + ',';
-        rgbStr2 = rgba + ceil(r * phiTenth) + ',' + ceil(g * phiTenth) + ',' + ceil(b * phiTenth) + ',';
+        rgbStr2 = rgba + r * phiTenth + ',' + g * phiTenth + ',' + b * phiTenth + ',';
         
         // Path for circle
         ctx[beginPath]();
@@ -145,7 +140,7 @@ function frame(){
 // Set body style
 doc.body.style.cssText = 'margin:0;background:#000;overflow:hidden';
 
-//setInterval(frame, frequency);
+// setInterval(frame, frequency);
 
 // toggle animation on any mouse click or key press
 var intervalRef;
