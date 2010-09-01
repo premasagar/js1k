@@ -20,23 +20,17 @@ var // Window & document
     ceil = M.ceil,
     random = M.random,
     pow = M.pow,
-    powPHI = pow(PHI, phiTen),
     
     // Settings
-    fps = PHIten * phiTen,
+    frequency = 10,
     unitsPerFrame = PHIten * PHI,
-    maxRadiusFactor = phi, // should be 0 to 1
-    driftFactor = pow(phi, 10),
+    driftFactor = PHI / 100,
     driftFactorWidth = width * driftFactor,
     driftFactorHeight = height * driftFactor,
     maxProximity = hypotenuse(width, height),
     
     // Modifiers
     tone = randomInt(3),
-    maxRadius = width * pow(phi, phi * (20 - (maxRadiusFactor * 10))), // should be pow(phi, phi * 10) to pow(phi, phi * 16)
-    
-    // Timeline
-    frequency = 1000 / fps,
     
     // String lookups
     len = 'length',
@@ -49,7 +43,7 @@ var // Window & document
     units = [],
     
     // Declarations
-    intensity, factor, radius, rgbStroke, proximity, firstCoords, i, x, y, r, g, b, rgbStr1, rgbStr2, driftX, driftY, lineToCoords, comparisonColor, xy;
+    intensity, factor, radius, rgbStroke, firstCoords, i, x, y, r, g, b, rgbStr1, rgbStr2, driftX, driftY, lineToCoords, comparisonColor, xy;
 
 // **
     
@@ -72,7 +66,7 @@ function lines(units){ // i === coords.length
     ctx[beginPath]();
     ctx.moveTo(xy[0], xy[1]);    
     for (; i; i--){
-        xy = units[i - 1];
+        xy = units[i-1];
         ctx.lineTo(xy[0], xy[1]);
     }
     ctx[closePath]();
@@ -80,10 +74,10 @@ function lines(units){ // i === coords.length
 
 function frame(){
     function color(which){
-        return which == tone ? (proximity < phiTenth ? RGBMAX : (proximity < phi * phi ? randomInt(61) + 195 : randomInt(98) + 158)) : randomInt(RGBMAX);
+        return which == tone ? (intensity > phiTenth ? RGBMAX : (intensity > phi * phi ? randomInt(61) + 195 : randomInt(98) + 158)) : randomInt(RGBMAX);
     }
     
-    units[len] = 0;
+    units[len] = i = 0;
     driftX = drift(driftFactorWidth);
     driftY = drift(driftFactorHeight);
     lineToCoords = randomInt(PHIten) ? // select coordinates to use in this run
@@ -91,22 +85,21 @@ function frame(){
         [randomInt(width), randomInt(height)];
 
     // Main calculation loop
-    for (i = 0; i < unitsPerFrame; i++){
+    for (; i < unitsPerFrame; i++){
         x = randomInt(width / PHI) * PHI;
         y = randomInt(height / PHI) * PHI;
         
         // Intensity
-        proximity = hypotenuse(x - phiWidth, y - phiHeight) / maxProximity;
-        intensity = 1 - proximity;
+        intensity = 1 - hypotenuse(x - phiWidth, y - phiHeight) / maxProximity; // proximity to the Golden Ration coords
         factor = random() * intensity * (intensity / PHI);
-        radius = maxRadius * (randomInt(powPHI) ? factor * PHI : (1 - factor * phi));
+        radius = driftFactorWidth * (randomInt(PHIten) ? factor * PHI : (1 - factor * phi));
+        //radius = driftFactorWidth / 2;
         
         // Colors
         r = color(0);
         g = color(1);
         b = color(2);
         rgbStr1 = rgba + r + ',' + g + ',' + b + ',';
-        rgbStr2 = rgba + r * phiTenth + ',' + g * phiTenth + ',' + b * phiTenth + ',';
         
         // Path for circle
         ctx[beginPath]();
@@ -114,8 +107,7 @@ function frame(){
         ctx[closePath]();
         
         // Canvas styles
-        rgbStroke = (randomInt(PHI) ? rgbStr2 : rgbStr1) + factor +')';
-        ctx[strokeStyle] = rgbStroke;
+        ctx[strokeStyle] = rgbStroke = (randomInt(PHI) ? rgba + r * phiTenth + ',' + g * phiTenth + ',' + b * phiTenth + ',' : rgbStr1) + factor +')';
         ctx.fillStyle = rgbStr1 + (factor * intensity) +')';
         
         // Draw
@@ -133,15 +125,15 @@ function frame(){
     
     // black
     lines(units);
-    ctx[strokeStyle] = rgbaBlack + (phi * firstCoords[2] * maxRadiusFactor) + ')';
+    ctx[strokeStyle] = rgbaBlack + (phi * phi * firstCoords[2]) + ')';
     ctx[stroke]();
 }
 
 // Set body style
 doc.body.style.cssText = 'margin:0;background:#000;overflow:hidden';
 
-// setInterval(frame, frequency);
-
+setInterval(frame, frequency);
+/*
 // toggle animation on any mouse click or key press
 var intervalRef;
 (canvas.onclick = doc.onkeydown = function(event){
@@ -151,4 +143,4 @@ var intervalRef;
             setInterval(frame, frequency);  // setInterval and create reference to it
     }
 })(); // start animation
-
+*/
