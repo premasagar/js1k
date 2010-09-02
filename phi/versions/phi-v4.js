@@ -1,9 +1,11 @@
-var // Document
+var // the var statement can be removed after minification, and the commas below changed to semicolons
+
+    // Document
     doc = document,
     canvas = doc.getElementById('c'),
     ctx = canvas.getContext('2d'),
-    width = canvas.width = doc.width - 16,
-    height = canvas.height = this.innerHeight - 16,
+    width = canvas.width = innerWidth - 21,
+    height = canvas.height = innerHeight - 21,
     
     // Maths
     M = Math,
@@ -20,7 +22,7 @@ var // Document
     
     // Settings
     frequency = 60,
-    unitsPerFrame = 26,
+    unitsPerFrame = 26, // approximation of PHIten * PHI
     driftFactor = .02,
     driftFactorWidth = width * driftFactor,
     driftFactorHeight = height * driftFactor,
@@ -39,7 +41,7 @@ var // Document
     closePath = 'closePath',
     units = [],
     
-    // Declarations
+    // Declarations - these can all be removed after minification
     intensity, factor, radius, rgbStroke, firstCoords, i, x, y, r, g, b, rgbStr1, rgbStr2, driftX, driftY, lineToCoords, comparisonColor, xy;
 
 // **
@@ -129,8 +131,9 @@ function frame(){
 // Set body style
 doc.body.style.background='#000';
 
+// Start animation
 
-
+// For minified version, the line below is uncommented, and block below is commented
 //setInterval(frame, frequency);
 
 // toggle animation on any mouse click or key press
@@ -141,4 +144,4 @@ var intervalRef;
             clearInterval(intervalRef) :    // clearInterval and set intervalRef to undefined
             setInterval(frame, frequency);  // setInterval and create reference to it
     }
-})(); // start animation
+})();

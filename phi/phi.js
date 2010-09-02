@@ -1,9 +1,11 @@
-var // Document
+var // the var statement can be removed after minification, and the commas below changed to semicolons
+
+    // Document
     doc = document,
     canvas = doc.getElementById('c'),
     ctx = canvas.getContext('2d'),
-    width = canvas.width = this.innerWidth - 21,
-    height = canvas.height = this.innerHeight - 21,
+    width = canvas.width = innerWidth - 21,
+    height = canvas.height = innerHeight - 21,
     
     // Maths
     M = Math,
@@ -20,7 +22,7 @@ var // Document
     
     // Settings
     frequency = 60,
-    unitsPerFrame = 26,
+    unitsPerFrame = 26, // approximation of PHIten * PHI
     driftFactor = .02,
     driftFactorWidth = width * driftFactor,
     driftFactorHeight = height * driftFactor,
@@ -39,7 +41,7 @@ var // Document
     closePath = 'closePath',
     units = [],
     
-    // Declarations
+    // Declarations - these can all be removed after minification
     intensity, factor, radius, rgbStroke, firstCoords, i, x, y, r, g, b, rgbStr1, rgbStr2, driftX, driftY, lineToCoords, comparisonColor, xy;
 
 // **
