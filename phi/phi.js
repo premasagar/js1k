@@ -129,8 +129,9 @@ function frame(){
 // Set body style
 doc.body.style.background='#000';
 
+// Start animation
 
-
+// For minified version, the line below is uncommented, and block below is commented
 //setInterval(frame, frequency);
 
 // toggle animation on any mouse click or key press
@@ -141,4 +142,4 @@ var intervalRef;
             clearInterval(intervalRef) :    // clearInterval and set intervalRef to undefined
             setInterval(frame, frequency);  // setInterval and create reference to it
     }
-})(); // start animation
+})();
