@@ -2,8 +2,8 @@ var // Document
     doc = document,
     canvas = doc.getElementById('c'),
     ctx = canvas.getContext('2d'),
-    width = canvas.width = this.innerWidth - 16,
-    height = canvas.height = this.innerHeight - 16,
+    width = canvas.width = this.innerWidth - 21,
+    height = canvas.height = this.innerHeight - 21,
     
     // Maths
     M = Math,
