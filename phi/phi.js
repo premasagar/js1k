@@ -42,7 +42,7 @@ var // the var statement can be removed after minification, and the commas below
     units = [],
     
     // Declarations - these can all be removed after minification
-    intensity, factor, radius, rgbStroke, firstCoords, i, x, y, r, g, b, rgbStr1, rgbStr2, driftX, driftY, lineToCoords, comparisonColor, xy;
+    intensity, factor, radius, rgbStroke, firstCoords, i, x, y, r, g, b, rgbStr1, rgbStr2, driftX, driftY, lineToCoords, comparisonColor, xy, burst;
 
 // **
     
@@ -73,7 +73,9 @@ function lines(units){ // i === coords.length
 
 function frame(){
     function color(which){
-        return which == tone ? (intensity < phi * phi ? randomInt(61) + 195 : randomInt(98) + 158) : randomInt(RGBMAX);
+        return which != tone || burst ?
+            randomInt(RGBMAX) :
+            (intensity < phi * phi ? randomInt(61) + 195 : randomInt(98) + 158);
     }
     
     units[len] = i = 0;
@@ -107,7 +109,7 @@ function frame(){
         
         // Canvas styles
         ctx[strokeStyle] = rgbStroke = (randomInt(PHI) ? rgba + r * phiTenth + ',' + g * phiTenth + ',' + b * phiTenth + ',' : rgbStr1) + factor +')';
-        ctx.fillStyle = rgbStr1 + (factor * intensity) +')';
+        ctx.fillStyle = rgbStr1 + (burst ? 1 : factor * intensity) +')';
         
         // Draw
         ctx[stroke]();
@@ -130,12 +132,18 @@ function frame(){
 
 // Set body style
 canvas.style.background='#000';
+canvas.onmousedown = function(){
+    burst = 1;
+};
+canvas.onmouseup = function(){
+    burst = 0;
+};
 
 // Start animation
 
 // For minified version, the line below is uncommented, and block below is commented
-//setInterval(frame, frequency);
-
+setInterval(frame, frequency);
+/*
 // toggle animation on any mouse click or key press
 var intervalRef;
 (canvas.onclick = doc.onkeydown = function(event){
@@ -145,3 +153,4 @@ var intervalRef;
             setInterval(frame, frequency);  // setInterval and create reference to it
     }
 })();
+*/
