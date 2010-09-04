@@ -64,8 +64,8 @@ function lines(units){ // i === coords.length
     // draw connecting lines
     ctx[beginPath]();
     ctx.moveTo(xy[0], xy[1]);    
-    for (; i; i--){
-        xy = units[i-1];
+    for (; i-- ;){
+        xy = units[i];
         ctx.lineTo(xy[0], xy[1]);
     }
     ctx[closePath]();
@@ -73,7 +73,7 @@ function lines(units){ // i === coords.length
 
 function frame(){
     function color(which){
-        return which == tone ? (intensity > phiTenth ? RGBMAX : (intensity > phi * phi ? randomInt(61) + 195 : randomInt(98) + 158)) : randomInt(RGBMAX);
+        return which == tone ? (intensity < phi * phi ? randomInt(61) + 195 : randomInt(98) + 158) : randomInt(RGBMAX);
     }
     
     units[len] = i = 0;
@@ -129,7 +129,7 @@ function frame(){
 }
 
 // Set body style
-doc.body.style.background='#000';
+canvas.style.background='#000';
 
 // Start animation
 
