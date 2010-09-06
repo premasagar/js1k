@@ -17,7 +17,6 @@ var // the var statement can be removed after minification, and the commas below
     phiWidth = width * phi,
     phiHeight = height * phi,
     RGBMAX = 255,
-    exp1 = M.exp(1),
     ceil = M.ceil,
     random = M.random,
     
@@ -39,11 +38,12 @@ var // the var statement can be removed after minification, and the commas below
     stroke = 'stroke',
     strokeStyle = stroke + 'Style',
     beginPath = 'beginPath',
-    closePath = 'closePath',
+    //closePath = 'closePath',
+    onmouse = 'onmouse',
     units = [],
     
     // Declarations - these can all be removed after minification
-    intensity, factor, radius, rgbStroke, firstCoords, i, x, y, r, g, b, rgbStr1, rgbStr2, driftX, driftY, lineToCoords, comparisonColor, xy, burst;
+    intensity, factor, radius, rgbStroke, firstCoords, i, x, y, r, g, b, rgbStr1, rgbStr2, driftX, driftY, lineToCoords, comparisonColor, xy, burst, lineStartOrigin;
 
 // **
     
@@ -59,59 +59,29 @@ function drift(maxDrift){
     return ceil(random() * (maxDrift * 2 + 1) - maxDrift / 2 - 1);
 }
 
-function lines(units){ // i === coords.length
-    xy = units[i = units[len] - 1];
-        
-    // draw connecting lines
+function lines(units){
     ctx[beginPath]();
-    ctx.moveTo(xy[0], xy[1]);    
-    for (; i-- ;){
-        xy = units[i];
+    lineStartOrigin = randomInt(PHIten);
+    ctx.moveTo(
+        lineStartOrigin ? phiWidth + driftX : randomInt(width),
+        lineStartOrigin ? phiHeight + driftY : randomInt(height)
+    );
+    for (i = units[len]; xy = units[--i];){
         ctx.lineTo(xy[0], xy[1]);
     }
-    ctx[closePath]();
+    //ctx[closePath]();
 }
 
 function frame(){
     function color(which){
         return which != tone || burst ?
-            randomInt(RGBMAX) :
-            //(intensity < phi * phi ? randomInt(61) + 195 : randomInt(98) + 158);
-            //(intensity < phi * phi ? randomInt(61) + 195 : RGBMAX);
-            
-            
-            /*
-            (intensity > phi ?
-                (intensity > 1 - (1 - phi) * phi ?
-                    (intensity > 1 - phiTenth ?
-                        RGBMAX :
-                        randomInt(61) + 195
-                    ) :
-                    0
-                ) :
-                randomInt(98) + 158
-            );
-            */
-            
-            ceil((M.exp(intensity) / exp1) * RGBMAX); // exponential intensity
-        /*
-        return which != (
-            burst ?
-                ((1%tone) + 1 ? 1%tone : 2) : // when the mouse is clicked, the tone is changed
-                tone
-        ) ?
-            randomInt(RGBMAX) :
-            (intensity < phi * phi ? randomInt(61) + 195 : randomInt(98) + 158);
-            //(intensity < phi * phi ? 0 : RGBMAX);
-            */
+            randomInt(RGBMAX) :            
+            ceil((M.exp(intensity) / 2.72) * RGBMAX); // exponential intensity (2.72 ~= Math.exp(1))
     }
     
     units[len] = i = 0; // save bytes by emptying array and setting 'i' in one statement
     driftX = drift(driftFactorWidth);
     driftY = drift(driftFactorHeight);
-    lineToCoords = randomInt(PHIten) ? // select coordinates to use in this run
-        [phiWidth + driftX, phiHeight + driftY] :
-        [randomInt(width), randomInt(height)];
 
     // Main calculation loop
     for (; i < unitsPerFrame; i++){
@@ -132,7 +102,7 @@ function frame(){
         // Path for circle
         ctx[beginPath]();
         ctx.arc(x, y, radius, 0, pi2, 0);
-        ctx[closePath]();
+        //ctx[closePath]();
         
         // Canvas styles
         ctx[strokeStyle] = rgbStroke = (randomInt(PHI) ? rgba + r * phiTenth + ',' + g * phiTenth + ',' + b * phiTenth + ',' : rgbStr1) + factor +')';
@@ -147,7 +117,7 @@ function frame(){
     firstCoords = units[0];
     
     // coloured lines
-    lines([firstCoords, lineToCoords]);
+    lines([firstCoords]);
     ctx[strokeStyle] = firstCoords[3];
     ctx[stroke]();
     
@@ -159,11 +129,9 @@ function frame(){
 
 // Set body style
 canvas.style.background='#000';
-canvas.onmousedown = function(){
-    burst = 1;
-};
-canvas.onmouseup = function(){
-    burst = 0;
+burst = 0;
+canvas[onmouse + 'up'] = canvas[onmouse + 'down'] = function(){
+    burst = ~burst;
 };
 
 // Start animation
