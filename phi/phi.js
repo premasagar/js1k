@@ -9,7 +9,7 @@ var // the var statement can be removed after minification, and the commas below
     
     // Maths
     M = Math,
-    pi2 = 7, // over-approximation of 2*PI
+    pi2 = 7, // over-approximation of 2*PI, for canvas arc drawing
     phi = .618,
     PHI = 1 / phi,
     phiTenth = phi / 10,
@@ -17,13 +17,14 @@ var // the var statement can be removed after minification, and the commas below
     phiWidth = width * phi,
     phiHeight = height * phi,
     RGBMAX = 255,
+    exp1 = M.exp(1),
     ceil = M.ceil,
     random = M.random,
     
     // Settings
     frequency = 60,
-    unitsPerFrame = 26, // approximation of PHIten * PHI
-    driftFactor = .02,
+    unitsPerFrame = 26, // approximation of PHI * PHI * 10
+    driftFactor = .02,  // approximation of PHI / 100
     driftFactorWidth = width * driftFactor,
     driftFactorHeight = height * driftFactor,
     maxProximity = hypotenuse(width, height),
@@ -75,10 +76,37 @@ function frame(){
     function color(which){
         return which != tone || burst ?
             randomInt(RGBMAX) :
+            //(intensity < phi * phi ? randomInt(61) + 195 : randomInt(98) + 158);
+            //(intensity < phi * phi ? randomInt(61) + 195 : RGBMAX);
+            
+            
+            /*
+            (intensity > phi ?
+                (intensity > 1 - (1 - phi) * phi ?
+                    (intensity > 1 - phiTenth ?
+                        RGBMAX :
+                        randomInt(61) + 195
+                    ) :
+                    0
+                ) :
+                randomInt(98) + 158
+            );
+            */
+            
+            ceil((M.exp(intensity) / exp1) * RGBMAX); // exponential intensity
+        /*
+        return which != (
+            burst ?
+                ((1%tone) + 1 ? 1%tone : 2) : // when the mouse is clicked, the tone is changed
+                tone
+        ) ?
+            randomInt(RGBMAX) :
             (intensity < phi * phi ? randomInt(61) + 195 : randomInt(98) + 158);
+            //(intensity < phi * phi ? 0 : RGBMAX);
+            */
     }
     
-    units[len] = i = 0;
+    units[len] = i = 0; // save bytes by emptying array and setting 'i' in one statement
     driftX = drift(driftFactorWidth);
     driftY = drift(driftFactorHeight);
     lineToCoords = randomInt(PHIten) ? // select coordinates to use in this run
@@ -93,8 +121,7 @@ function frame(){
         // Intensity
         intensity = 1 - hypotenuse(x - phiWidth, y - phiHeight) / maxProximity; // proximity to the Golden Ration coords
         factor = random() * intensity * (intensity / PHI);
-        radius = driftFactorWidth * (randomInt(PHIten) ? factor * PHI : (1 - factor * phi));
-        //radius = driftFactorWidth / 2;
+        radius = driftFactorWidth * (randomInt(PHIten) ? factor * PHI : (1 - factor * phi)); // add variety to radius - show large circles at the periphery only 1:PHI times
         
         // Colors
         r = color(0);
@@ -109,7 +136,7 @@ function frame(){
         
         // Canvas styles
         ctx[strokeStyle] = rgbStroke = (randomInt(PHI) ? rgba + r * phiTenth + ',' + g * phiTenth + ',' + b * phiTenth + ',' : rgbStr1) + factor +')';
-        ctx.fillStyle = rgbStr1 + (burst ? 1 : factor * intensity) +')';
+        ctx.fillStyle = rgbStr1 + (burst ? intensity * phi : factor * intensity) +')';
         
         // Draw
         ctx[stroke]();
@@ -142,15 +169,14 @@ canvas.onmouseup = function(){
 // Start animation
 
 // For minified version, the line below is uncommented, and block below is commented
-setInterval(frame, frequency);
-/*
+//setInterval(frame, frequency);
+
 // toggle animation on any mouse click or key press
 var intervalRef;
 (canvas.onclick = doc.onkeydown = function(event){
-    if (!event || event.which == 1 || event.which == 32){
+    if (!event || /*event.which == 1 || */event.which == 32){
         intervalRef = intervalRef ?
             clearInterval(intervalRef) :    // clearInterval and set intervalRef to undefined
             setInterval(frame, frequency);  // setInterval and create reference to it
     }
 })();
-*/
